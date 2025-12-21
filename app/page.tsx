@@ -5,6 +5,7 @@ import Timeline from "@/components/Timeline";
 import Polaroid from "@/components/Polaroid";
 import FlashOverlay from "@/components/FlashOverlay";
 import { experiences, Experience } from "@/data/experiences";
+import { getCurveX, getSpacing } from "@/utils/curve";
 
 const FLASH_DURATION = 0.5; // in seconds
 
@@ -43,18 +44,14 @@ export default function Home() {
   };
 
   const getPolaroidPosition = (index: number) => {
-    const amplitude = 150;
-    const frequency = 0.01;
-    const spacing = Math.PI / frequency; // One experience per half-period (π radians)
     const centerX = (windowWidth > 0 ? windowWidth / 2 : 800);
     
     // Calculate position along sin wave (matching Timeline)
-    const y = 80 + index * spacing;
-    const x = centerX + Math.sin(y * frequency) * amplitude;
+    const y = 80 + 100 + index * getSpacing();
+    const x = centerX + getCurveX(y);
     
     // Position Polaroid offset from the thumbtack
-    const isLeft = Math.sin(y * frequency) < 0;
-    const offsetX = isLeft ? -300 : 300; // Offset to the side of the wave
+    const offsetX = x < centerX ? -300 : 300; // Offset to the side of the wave
     
     return {
       top: y - 50,

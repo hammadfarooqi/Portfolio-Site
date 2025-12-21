@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Experience } from "@/data/experiences";
+import { getCurveX, getSpacing } from "@/utils/curve";
+import Notecard from "@/components/Notecard";
 
 interface TimelineProps {
   experiences: Experience[];
@@ -13,7 +15,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
   const amplitude = 150; // Horizontal amplitude of the sin wave
   const frequency = 0.01; // Frequency of the sin wave (lower = more stretched)
   const spacing = Math.PI / frequency; // One experience per half-period (π radians)
-  const totalHeight = experiences.length * spacing + 160; // Total height needed
+  const totalHeight = experiences.length * spacing + 280; // Total height needed
 
   useEffect(() => {
     setWindowWidth(window.innerWidth);
@@ -27,8 +29,8 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
   // Generate sin wave path
   const generatePath = () => {
     const points: string[] = [];
-    for (let y = 80; y <= totalHeight; y += 2) {
-      const x = centerX + Math.sin(y * frequency) * amplitude;
+    for (let y = 80; y <= totalHeight - 80; y += 2) {
+      const x = centerX + getCurveX(y);
       points.push(`${x},${y}`);
     }
     return `M ${points.join(' L ')}`;
@@ -36,8 +38,8 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
 
   // Calculate position for each thumbtack along the sin wave
   const getThumbtackPosition = (index: number) => {
-    const y = 80 + index * spacing;
-    const x = centerX + Math.sin(y * frequency) * amplitude;
+    const y = 80 + 100 + index * getSpacing();
+    const x = centerX + getCurveX(y);
     return { x, y };
   };
 
@@ -58,35 +60,27 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
         />
       </svg>
       
-      {/* Thumbtacks */}
+      {/* Notecards */}
       {experiences.map((experience, index) => {
         const position = getThumbtackPosition(index);
-        const isLeft = Math.sin(position.y * frequency) < 0;
+        // Add slight random rotation for organic feel (between -3 and 3 degrees)
+        const rotation = (index % 5 - 2) * 1.5;
         
         return (
           <div
             key={index}
-            className="absolute z-10 flex items-center gap-8 cursor-pointer group"
+            className="absolute z-10"
             style={{
               left: `${position.x}px`,
               top: `${position.y}px`,
               transform: 'translate(-50%, -50%)',
             }}
-            onClick={() => onThumbtackClick(experience, index)}
           >
-            {/* Thumbtack icon */}
-            <div className="relative">
-              <div className="w-4 h-4 bg-gray-600 rounded-full border-2 border-gray-800 group-hover:scale-110 transition-transform" />
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-800" />
-            </div>
-            
-            {/* Title and date */}
-            <div className={`flex flex-col ${isLeft ? 'items-end text-right' : 'items-start text-left'}`}>
-              <h3 className="text-lg font-semibold text-gray-800 group-hover:text-gray-900 transition-colors">
-                {experience.title}
-              </h3>
-              <p className="text-sm text-gray-500">{experience.date}</p>
-            </div>
+            <Notecard
+              experience={experience}
+              onClick={() => onThumbtackClick(experience, index)}
+              rotation={rotation}
+            />
           </div>
         );
       })}
