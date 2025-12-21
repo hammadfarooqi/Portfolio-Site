@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap');
+
+:root {
+  --background: #F9F9F9;
+}
+
+body {
+  background-color: var(--background);
+  cursor: none;
+  overflow-x: hidden;
+}
+
+/* Custom viewfinder cursor */
+.custom-cursor {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #333;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease-out;
+}
+
+/* Handwritten font */
+.font-handwritten {
+  font-family: 'Caveat', cursive;
+}
+
