@@ -6,10 +6,18 @@ import Polaroid from "@/components/Polaroid";
 import FlashOverlay from "@/components/FlashOverlay";
 import { experiences, Experience } from "@/data/experiences";
 
+const FLASH_DURATION = 0.5; // in seconds
+
+interface PolaroidData {
+  experience: Experience;
+  index: number;
+  rotation: number;
+}
+
 export default function Home() {
-  const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null);
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [polaroids, setPolaroids] = useState<PolaroidData[]>([]);
   const [showFlash, setShowFlash] = useState(false);
+  const [flashKey, setFlashKey] = useState(0);
   const [windowWidth, setWindowWidth] = useState(0);
 
   useEffect(() => {
@@ -20,44 +28,57 @@ export default function Home() {
   }, []);
 
   const handleThumbtackClick = (experience: Experience, index: number) => {
-    // Trigger flash
+    // Trigger flash by incrementing key to force remount
+    setFlashKey(prev => prev + 1);
     setShowFlash(true);
-    setTimeout(() => setShowFlash(false), 100);
+    setTimeout(() => setShowFlash(false), FLASH_DURATION * 1000);
 
-    // Set selected experience after flash
+    // Generate random rotation angle between -15 and 15 degrees
+    const randomRotation = Math.random() * 30 - 15;
+
+    // Add new Polaroid to the array after flash
     setTimeout(() => {
-      setSelectedExperience(experience);
-      setSelectedIndex(index);
+      setPolaroids(prev => [...prev, { experience, index, rotation: randomRotation }]);
     }, 50);
   };
 
   const getPolaroidPosition = (index: number) => {
-    const spacing = 200;
-    // Account for py-20 padding (80px) and calculate position
-    const topPosition = 80 + index * spacing;
-    // Position Polaroid to the right of the timeline (center + 100px)
-    const leftPosition = windowWidth > 0 ? windowWidth / 2 + 100 : 800;
+    const amplitude = 150;
+    const frequency = 0.01;
+    const spacing = Math.PI / frequency; // One experience per half-period (π radians)
+    const centerX = (windowWidth > 0 ? windowWidth / 2 : 800);
+    
+    // Calculate position along sin wave (matching Timeline)
+    const y = 80 + index * spacing;
+    const x = centerX + Math.sin(y * frequency) * amplitude;
+    
+    // Position Polaroid offset from the thumbtack
+    const isLeft = Math.sin(y * frequency) < 0;
+    const offsetX = isLeft ? -300 : 300; // Offset to the side of the wave
+    
     return {
-      top: topPosition - 50,
-      left: leftPosition,
+      top: y - 50,
+      horizontal: x + offsetX,
     };
   };
 
   return (
     <main className="min-h-screen bg-background relative">
-      <FlashOverlay isVisible={showFlash} />
+      <FlashOverlay key={flashKey} isVisible={showFlash} duration={FLASH_DURATION} />
       
       <Timeline 
         experiences={experiences} 
         onThumbtackClick={handleThumbtackClick}
       />
       
-      {selectedExperience && selectedIndex !== null && (
+      {polaroids.map((polaroid, i) => (
         <Polaroid
-          experience={selectedExperience}
-          position={getPolaroidPosition(selectedIndex)}
+          key={`${polaroid.index}-${i}`}
+          experience={polaroid.experience}
+          position={getPolaroidPosition(polaroid.index)}
+          rotation={polaroid.rotation}
         />
-      )}
+      ))}
     </main>
   );
 }

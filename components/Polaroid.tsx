@@ -7,19 +7,20 @@ import Image from "next/image";
 interface PolaroidProps {
   experience: Experience;
   position: { top: number; left: number };
+  rotation: number;
 }
 
-export default function Polaroid({ experience, position }: PolaroidProps) {
+export default function Polaroid({ experience, position, rotation }: PolaroidProps) {
   return (
     <motion.div
       className="absolute bg-white p-4 pb-12 shadow-lg"
       style={{
         top: `${position.top}px`,
-        left: `${position.left}px`,
+        left: `calc(${position.horizontal}px - 150px)`, // Center the 300px-wide polaroid horizontally
         width: "300px",
       }}
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
+      initial={{ opacity: 0, scale: 0.8, rotate: rotation }}
+      animate={{ opacity: 1, scale: 1, rotate: rotation }}
       transition={{ duration: 0.3 }}
     >
       <div className="relative w-full h-64 mb-2 overflow-hidden bg-white">
