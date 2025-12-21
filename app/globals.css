@@ -10,20 +10,89 @@
 
 body {
   background-color: var(--background);
-  cursor: none;
+  cursor: none !important;
   overflow-x: hidden;
 }
 
-/* Custom viewfinder cursor */
+/* Ensure no elements override cursor */
+* {
+  cursor: none !important;
+}
+
+/* Custom corner cursor - rectangular camera viewfinder (3:2 aspect ratio) */
 .custom-cursor {
-  width: 40px;
-  height: 40px;
-  border: 2px solid #333;
   position: fixed;
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
   transition: transform 0.1s ease-out;
+  --cursor-width: 60px;  /* 3:2 aspect ratio */
+  --cursor-height: 40px;
+  --corner-size: 10px;
+  --corner-thickness: 2px;
+}
+
+.custom-cursor.expanded {
+  --cursor-width: 90px;  /* Maintain 3:2 aspect ratio */
+  --cursor-height: 60px;
+  --corner-size: 15px;
+}
+
+.custom-cursor.hidden {
+  opacity: 0;
+}
+
+/* Corner elements */
+.custom-cursor::before,
+.custom-cursor::after {
+  content: '';
+  position: absolute;
+  border: var(--corner-thickness) solid #333;
+  transition: all 0.2s ease-out;
+}
+
+/* Top-left corner */
+.custom-cursor::before {
+  top: calc(-1 * var(--cursor-height) / 2);
+  left: calc(-1 * var(--cursor-width) / 2);
+  width: var(--corner-size);
+  height: var(--corner-size);
+  border-right: none;
+  border-bottom: none;
+}
+
+/* Bottom-right corner */
+.custom-cursor::after {
+  bottom: calc(-1 * var(--cursor-height) / 2);
+  right: calc(-1 * var(--cursor-width) / 2);
+  width: var(--corner-size);
+  height: var(--corner-size);
+  border-left: none;
+  border-top: none;
+}
+
+/* Top-right and bottom-left corners using inner elements */
+.custom-cursor .corner-top-right,
+.custom-cursor .corner-bottom-left {
+  position: absolute;
+  border: var(--corner-thickness) solid #333;
+  width: var(--corner-size);
+  height: var(--corner-size);
+  transition: all 0.2s ease-out;
+}
+
+.custom-cursor .corner-top-right {
+  top: calc(-1 * var(--cursor-height) / 2);
+  right: calc(-1 * var(--cursor-width) / 2);
+  border-left: none;
+  border-bottom: none;
+}
+
+.custom-cursor .corner-bottom-left {
+  bottom: calc(-1 * var(--cursor-height) / 2);
+  left: calc(-1 * var(--cursor-width) / 2);
+  border-right: none;
+  border-top: none;
 }
 
 /* Handwritten font */

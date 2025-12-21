@@ -19,6 +19,7 @@ export default function Notecard({ experience, onClick, rotation = 0 }: Notecard
   return (
     <div
       className="relative cursor-pointer group"
+      data-clickable="true"
       onClick={onClick}
       style={{
         transform: `rotate(${rotation}deg)`,
