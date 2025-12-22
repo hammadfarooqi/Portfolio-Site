@@ -41,6 +41,7 @@ export default function Home() {
     
     // Generate random rotation angle between -15 and 15 degrees
     const randomRotation = Math.random() * 30 - 15;
+    // const randomRotation = 0;
 
     // Trigger flash by incrementing key to force remount
     setFlashKey(prev => prev + 1);
