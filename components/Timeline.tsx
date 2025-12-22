@@ -97,7 +97,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
 
         return (
           <div
-            key={experience.id || index}
+            key={index}
             className="absolute z-10 transition-all duration-300 ease-out"
             style={{
               // FIXED: Use 50% for true center, then add the curve via calc
