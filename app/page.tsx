@@ -23,10 +23,16 @@ export default function Home() {
   const [windowWidth, setWindowWidth] = useState(0);
 
   useEffect(() => {
-    setWindowWidth(window.innerWidth);
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const updateWidth = () => {
+      // On mobile, use clientWidth to exclude scrollbar for accurate centering
+      const width = window.innerWidth <= 768 
+        ? (document.documentElement.clientWidth || window.innerWidth)
+        : window.innerWidth;
+      setWindowWidth(width);
+    };
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
   }, []);
 
   const handleThumbtackClick = (experience: Experience, index: number) => {
@@ -49,11 +55,13 @@ export default function Home() {
 
   const getPolaroidPosition = (index: number) => {
     const centerX = (windowWidth > 0 ? windowWidth / 2 : 800);
+    const wideScreen = windowWidth >= 1152;
+    const thinScreen = windowWidth <= 768;
 
     if (index === 0) {
       return {
         top: 40,
-        horizontal: centerX - 300,
+        horizontal: centerX - (wideScreen ? 300 : thinScreen ? 150 : 250),
       };
     }
     
@@ -62,10 +70,16 @@ export default function Home() {
     const x = centerX + getCurveX(y);
     
     // Position Polaroid offset from the thumbtack
-    const offsetX = x < centerX ? -300 : 300; // Offset to the side of the wave
+    // For xl/2xl screens: offsetX = x < centerX ? -300 : 300
+    // For lg and lower screens: offsetX = x < centerX ? 300 : -300
+    const offsetX = wideScreen 
+      ? (x < centerX ? -300 : 300)
+      : (x < centerX ? 300 : -300);
     
+    const placementY = wideScreen ? y - 50 : y - 200
+
     return {
-      top: y - 50,
+      top: placementY,
       horizontal: x + offsetX,
     };
   };

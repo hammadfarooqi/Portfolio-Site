@@ -14,8 +14,16 @@ export default function RootLayout({
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [isInViewport, setIsInViewport] = useState(true);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   useEffect(() => {
+    // Detect touch device
+    const checkTouchDevice = () => {
+      const touchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      setIsTouchDevice(touchDevice);
+    };
+    checkTouchDevice();
+
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
       // Check if mouse is within viewport
@@ -81,21 +89,23 @@ export default function RootLayout({
     };
   }, []);
 
-  const cursorClasses = `custom-cursor ${isHovering ? 'expanded' : ''} ${!isInViewport ? 'hidden' : ''}`;
+  const cursorClasses = `custom-cursor ${isHovering ? 'expanded' : ''} ${!isInViewport ? 'hidden' : ''} ${isTouchDevice ? 'hidden' : ''}`;
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div
-          className={cursorClasses}
-          style={{
-            left: `${mousePosition.x}px`,
-            top: `${mousePosition.y}px`,
-          }}
-        >
-          <div className="corner-top-right" />
-          <div className="corner-bottom-left" />
-        </div>
+        {!isTouchDevice && (
+          <div
+            className={cursorClasses}
+            style={{
+              left: `${mousePosition.x}px`,
+              top: `${mousePosition.y}px`,
+            }}
+          >
+            <div className="corner-top-right" />
+            <div className="corner-bottom-left" />
+          </div>
+        )}
         {children}
       </body>
     </html>

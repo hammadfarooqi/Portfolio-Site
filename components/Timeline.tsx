@@ -19,16 +19,23 @@ interface TimelineProps {
 
 export default function Timeline({ experiences, onThumbtackClick }: TimelineProps) {
   const [windowWidth, setWindowWidth] = useState(0);
-  const amplitude = 150; // Horizontal amplitude of the sin wave
+  // Reduce amplitude on smaller screens for better mobile experience
+  const amplitude = windowWidth >= 1280 ? 150 : windowWidth >= 768 ? 100 : 50;
   const frequency = 0.01; // Frequency of the sin wave (lower = more stretched)
   const spacing = Math.PI / frequency; // One experience per half-period (π radians)
   const totalHeight = experiences.length * spacing + 360; // Total height needed
 
   useEffect(() => {
-    setWindowWidth(window.innerWidth);
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const updateWidth = () => {
+      // On mobile, use clientWidth to exclude scrollbar for accurate centering
+      const width = window.innerWidth <= 768 
+        ? (document.documentElement.clientWidth || window.innerWidth)
+        : window.innerWidth;
+      setWindowWidth(width);
+    };
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
   }, []);
 
   const centerX = windowWidth > 0 ? windowWidth / 2 : 800;
@@ -47,6 +54,10 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
   const getThumbtackPosition = (index: number) => {
     const y = 250 + index * getSpacing();
     const x = centerX + getCurveX(y);
+
+    if (windowWidth <= 768 && index === 0) {
+      return { x, y: y - 100 };
+    }
     return { x, y };
   };
 
@@ -86,6 +97,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
           >
             {index === 0 ? (
               <>
+                {/* <p>`${windowWidth}`</p> */}
                 <HeaderNotecard
                   experience={experience}
                   onClick={() => onThumbtackClick(experience, index)}
@@ -99,7 +111,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
                   }}
                 >
                   <svg
-                    className="w-7 h-7 text-gray-600 mt-0.5"
+                    className="w-7 sm:h-7 text-gray-600 mt-0.5"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
@@ -117,7 +129,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
                       d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                   </svg>
-                  <div className={`text-sm text-gray-600 ${indieFlower.className} min-w-[200px]`}>
+                  <div className={`text-sm text-gray-600 ${indieFlower.className} min-w-[150px] sm:min-w-[200px]`}>
                     <p className="whitespace-nowrap">Point & Click to take Snapshots</p>
                     <p>of each Notecard!</p>
                   </div>

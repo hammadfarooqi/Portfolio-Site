@@ -20,7 +20,7 @@ interface PolaroidProps {
 export default function Polaroid({ experience, photo, position, rotation }: PolaroidProps) {
   return (
     <motion.div
-      className="absolute bg-white p-4 pb-12 shadow-lg"
+      className="absolute z-10 bg-white p-4 pb-12 shadow-lg"
       style={{
         top: `${position.top}px`,
         left: `calc(${position.horizontal}px - 150px)`, // Center the 300px-wide polaroid horizontally

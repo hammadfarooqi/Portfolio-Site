@@ -25,10 +25,10 @@ function HeaderNotecard({ experience, onClick, rotation = 0 }: HeaderNotecardPro
       
       {/* Notecard */}
       <div 
-        className="relative bg-[#FFFEF7] w-[480px] p-4 shadow-md group-hover:shadow-lg transition-shadow border border-gray-200/50"
+        className="relative bg-[#FFFEF7] w-[300px] md:w-[480px] md:max-w-[480px] p-4 shadow-md group-hover:shadow-lg transition-shadow border border-gray-200/50"
       >
         {/* Title */}
-        <h1 className="text-5xl font-bold text-gray-800 mb-2 group-hover:text-gray-900 transition-colors cursor-pointer leading-tight whitespace-nowrap text-center">
+        <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-2 group-hover:text-gray-900 transition-colors cursor-pointer leading-tight whitespace-nowrap text-center">
           {experience.title}
         </h1>
         
