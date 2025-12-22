@@ -6,7 +6,7 @@ import Image from "next/image";
 
 interface PolaroidProps {
   experience: Experience;
-  position: { top: number; left: number };
+  position: { top: number; horizontal: number };
   rotation: number;
 }
 

@@ -8,6 +8,13 @@ export interface Experience {
 
 export const experiences: Experience[] = [
   {
+    title: "Hammad Farooqi",
+    date: "Princeton '27 Undergrad",
+    description: "Princeton University undergraduate, passionate about building meaningful digital experiences.",
+    imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop",
+    caption: "About Me"
+  },
+  {
     title: "E-Commerce Platform",
     date: "2024",
     description: "A full-stack e-commerce solution with payment integration and inventory management.",

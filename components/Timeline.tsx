@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Experience } from "@/data/experiences";
 import { getCurveX, getSpacing } from "@/utils/curve";
 import Notecard from "@/components/Notecard";
+import HeaderNotecard from "@/components/HeaderNotecard";
 
 interface TimelineProps {
   experiences: Experience[];
@@ -15,7 +16,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
   const amplitude = 150; // Horizontal amplitude of the sin wave
   const frequency = 0.01; // Frequency of the sin wave (lower = more stretched)
   const spacing = Math.PI / frequency; // One experience per half-period (π radians)
-  const totalHeight = experiences.length * spacing + 280; // Total height needed
+  const totalHeight = experiences.length * spacing + 360; // Total height needed
 
   useEffect(() => {
     setWindowWidth(window.innerWidth);
@@ -29,8 +30,8 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
   // Generate sin wave path
   const generatePath = () => {
     const points: string[] = [];
-    for (let y = 80; y <= totalHeight - 80; y += 2) {
-      const x = centerX + getCurveX(y);
+    for (let y = 0; y <= totalHeight; y += 2) {
+      const x = centerX + getCurveX(Math.max(y, 180));
       points.push(`${x},${y}`);
     }
     return `M ${points.join(' L ')}`;
@@ -38,7 +39,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
 
   // Calculate position for each thumbtack along the sin wave
   const getThumbtackPosition = (index: number) => {
-    const y = 80 + 100 + index * getSpacing();
+    const y = 250 + index * getSpacing();
     const x = centerX + getCurveX(y);
     return { x, y };
   };
@@ -76,11 +77,19 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
               transform: 'translate(-50%, -50%)',
             }}
           >
-            <Notecard
-              experience={experience}
-              onClick={() => onThumbtackClick(experience, index)}
-              rotation={rotation}
-            />
+            {index === 0 ? (
+              <HeaderNotecard
+                experience={experience}
+                onClick={() => onThumbtackClick(experience, index)}
+                rotation={rotation}
+              />
+            ) : (
+              <Notecard
+                experience={experience}
+                onClick={() => onThumbtackClick(experience, index)}
+                rotation={rotation}
+              />
+            )}
           </div>
         );
       })}

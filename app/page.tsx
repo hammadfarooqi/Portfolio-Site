@@ -45,9 +45,16 @@ export default function Home() {
 
   const getPolaroidPosition = (index: number) => {
     const centerX = (windowWidth > 0 ? windowWidth / 2 : 800);
+
+    if (index === 0) {
+      return {
+        top: 40,
+        horizontal: centerX - 300,
+      };
+    }
     
     // Calculate position along sin wave (matching Timeline)
-    const y = 80 + 100 + index * getSpacing();
+    const y = 240 + index * getSpacing();
     const x = centerX + getCurveX(y);
     
     // Position Polaroid offset from the thumbtack
@@ -68,6 +75,7 @@ export default function Home() {
         onThumbtackClick={handleThumbtackClick}
       />
       
+      {/* Polaroids */}
       {polaroids.map((polaroid, i) => (
         <Polaroid
           key={`${polaroid.index}-${i}`}

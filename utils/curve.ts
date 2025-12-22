@@ -6,7 +6,7 @@ const CURVE_CONFIG = {
 
 export const getCurveX = (y: number) => {
   const { amplitude, frequency, curveStrength } = CURVE_CONFIG;
-  const sinValue = Math.sin(y * frequency);
+  const sinValue = Math.sin((y-80) * frequency);
   const sign = Math.sign(sinValue);
   const absSin = Math.abs(sinValue);
   return amplitude * sign * (1 - Math.pow(1 - absSin, curveStrength));
