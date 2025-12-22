@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Experience } from "@/data/experiences";
 
 interface NotecardProps {
@@ -8,13 +9,13 @@ interface NotecardProps {
   rotation?: number;
 }
 
-export default function Notecard({ experience, onClick, rotation = 0 }: NotecardProps) {
-  // Truncate description if too long
+function Notecard({ experience, onClick, rotation = 0 }: NotecardProps) {
+  // Truncate shortDescription if too long
   const maxDescriptionLength = 100;
   const truncatedDescription = 
-    experience.description.length > maxDescriptionLength
-      ? experience.description.substring(0, maxDescriptionLength) + "..."
-      : experience.description;
+    experience.shortDescription.length > maxDescriptionLength
+      ? experience.shortDescription.substring(0, maxDescriptionLength) + "..."
+      : experience.shortDescription;
 
   return (
     <div
@@ -47,4 +48,6 @@ export default function Notecard({ experience, onClick, rotation = 0 }: Notecard
     </div>
   );
 }
+
+export default memo(Notecard);
 

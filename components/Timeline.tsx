@@ -65,6 +65,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
       {experiences.map((experience, index) => {
         const position = getThumbtackPosition(index);
         // Add slight random rotation for organic feel (between -3 and 3 degrees)
+        // Stable rotation based on index
         const rotation = (index % 5 - 2) * 1.5;
         
         return (

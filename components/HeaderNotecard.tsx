@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { Experience } from "@/data/experiences";
 
 interface HeaderNotecardProps {
@@ -8,11 +9,12 @@ interface HeaderNotecardProps {
   rotation?: number;
 }
 
-export default function HeaderNotecard({ experience, onClick, rotation = 0 }: HeaderNotecardProps) {
+function HeaderNotecard({ experience, onClick, rotation = 0 }: HeaderNotecardProps) {
   return (
     <div
       className="relative cursor-pointer group"
       data-clickable="true"
+      onClick={onClick}
       style={{
         transform: `rotate(${rotation}deg)`,
       }}
@@ -24,7 +26,6 @@ export default function HeaderNotecard({ experience, onClick, rotation = 0 }: He
       {/* Notecard */}
       <div 
         className="relative bg-[#FFFEF7] w-[480px] p-4 shadow-md group-hover:shadow-lg transition-shadow border border-gray-200/50"
-        onClick={onClick}
       >
         {/* Title */}
         <h1 className="text-5xl font-bold text-gray-800 mb-2 group-hover:text-gray-900 transition-colors cursor-pointer leading-tight whitespace-nowrap text-center">
@@ -82,4 +83,6 @@ export default function HeaderNotecard({ experience, onClick, rotation = 0 }: He
     </div>
   );
 }
+
+export default memo(HeaderNotecard);
 

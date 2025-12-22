@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import Timeline from "@/components/Timeline";
 import Polaroid from "@/components/Polaroid";
 import FlashOverlay from "@/components/FlashOverlay";
-import { experiences, Experience } from "@/data/experiences";
+import { experiences, Experience, Photo } from "@/data/experiences";
 import { getCurveX, getSpacing } from "@/utils/curve";
 
 const FLASH_DURATION = 0.5; // in seconds
 
 interface PolaroidData {
   experience: Experience;
+  photo: Photo;
   index: number;
   rotation: number;
 }
@@ -29,17 +30,20 @@ export default function Home() {
   }, []);
 
   const handleThumbtackClick = (experience: Experience, index: number) => {
+    // Randomly select a photo from the experience's photos
+    const randomPhoto = experience.photos[Math.floor(Math.random() * experience.photos.length)];
+    
+    // Generate random rotation angle between -15 and 15 degrees
+    const randomRotation = Math.random() * 30 - 15;
+
     // Trigger flash by incrementing key to force remount
     setFlashKey(prev => prev + 1);
     setShowFlash(true);
     setTimeout(() => setShowFlash(false), FLASH_DURATION * 1000);
 
-    // Generate random rotation angle between -15 and 15 degrees
-    const randomRotation = Math.random() * 30 - 15;
-
     // Add new Polaroid to the array after flash
     setTimeout(() => {
-      setPolaroids(prev => [...prev, { experience, index, rotation: randomRotation }]);
+      setPolaroids(prev => [...prev, { experience, photo: randomPhoto, index, rotation: randomRotation }]);
     }, 50);
   };
 
@@ -67,7 +71,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-background relative">
+    <main className="min-h-screen relative">
       <FlashOverlay key={flashKey} isVisible={showFlash} duration={FLASH_DURATION} />
       
       <Timeline 
@@ -78,8 +82,9 @@ export default function Home() {
       {/* Polaroids */}
       {polaroids.map((polaroid, i) => (
         <Polaroid
-          key={`${polaroid.index}-${i}`}
+          key={`${polaroid.index}-${i}-${polaroid.photo.imageUrl}`}
           experience={polaroid.experience}
+          photo={polaroid.photo}
           position={getPolaroidPosition(polaroid.index)}
           rotation={polaroid.rotation}
         />

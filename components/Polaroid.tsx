@@ -1,16 +1,23 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Experience } from "@/data/experiences";
+import { Photo, Experience } from "@/data/experiences";
 import Image from "next/image";
+import { Kalam } from "next/font/google";
+
+const kalam = Kalam({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 interface PolaroidProps {
   experience: Experience;
+  photo: Photo;
   position: { top: number; horizontal: number };
   rotation: number;
 }
 
-export default function Polaroid({ experience, position, rotation }: PolaroidProps) {
+export default function Polaroid({ experience, photo, position, rotation }: PolaroidProps) {
   return (
     <motion.div
       className="absolute bg-white p-4 pb-12 shadow-lg"
@@ -31,7 +38,7 @@ export default function Polaroid({ experience, position, rotation }: PolaroidPro
           transition={{ duration: 2, ease: "easeOut" }}
         >
           <Image
-            src={experience.imageUrl}
+            src={photo.imageUrl}
             alt={experience.title}
             fill
             className="object-cover"
@@ -39,11 +46,11 @@ export default function Polaroid({ experience, position, rotation }: PolaroidPro
           />
         </motion.div>
       </div>
-      <p className="text-sm text-gray-700 font-handwritten text-center">
-        {experience.caption}
+      <p className={`text-sm text-gray-700 ${kalam.className} text-center`}>
+        {photo.caption}
       </p>
-      <p className="text-xs text-gray-500 font-handwritten text-center mt-1">
-        {experience.description}
+      <p className={`text-xs text-gray-500 ${kalam.className} text-center mt-1`}>
+        {photo.longDescription}
       </p>
     </motion.div>
   );
