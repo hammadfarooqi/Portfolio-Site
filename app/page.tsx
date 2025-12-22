@@ -61,23 +61,26 @@ export default function Home() {
 
     if (index === 0) {
       return {
-        top: 40,
-        horizontal: centerX - (wideScreen ? 300 : thinScreen ? 150 : 250),
+        top: thinScreen ? 200 : 40, // Much lower on mobile
+        horizontal: centerX - (wideScreen ? 300 : thinScreen ? 100 : 250),
       };
     }
     
     // Calculate position along sin wave (matching Timeline)
     const y = 240 + index * getSpacing();
-    const x = centerX + getCurveX(y);
+    const x = centerX + getCurveX(y, windowWidth);
     
     // Position Polaroid offset from the thumbtack
     // For xl/2xl screens: offsetX = x < centerX ? -300 : 300
     // For lg and lower screens: offsetX = x < centerX ? 300 : -300
+    // For mobile (thinScreen): use 200 instead of 300
+    const polaroidWidth = thinScreen ? 200 : 300;
     const offsetX = wideScreen 
       ? (x < centerX ? -300 : 300)
-      : (x < centerX ? 300 : -300);
+      : (x < centerX ? polaroidWidth : -polaroidWidth);
     
-    const placementY = wideScreen ? y - 50 : y - 200
+    // On mobile, make polaroids appear slightly lower
+    const placementY = wideScreen ? y - 50 : (thinScreen ? y - 100 : y - 200);
 
     return {
       top: placementY,
@@ -102,6 +105,7 @@ export default function Home() {
           photo={polaroid.photo}
           position={getPolaroidPosition(polaroid.index)}
           rotation={polaroid.rotation}
+          windowWidth={windowWidth}
         />
       ))}
     </main>

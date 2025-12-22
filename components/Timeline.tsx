@@ -46,7 +46,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
     if (windowWidth === 0) return "";
     const points: string[] = [];
     for (let y = 0; y <= totalHeight; y += 4) {
-      const x = centerX + getCurveX(Math.max(y, 180));
+      const x = centerX + getCurveX(Math.max(y, 180), windowWidth);
       points.push(`${x},${y}`);
     }
     return `M ${points.join(' L ')}`;
@@ -63,7 +63,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
         style={{ overflow: 'visible' }}
       >
         {/* Debug Line (Optional: Remove in production) */}
-        <line
+        {/* <line
           x1="50%"
           y1={0}
           x2="50%"
@@ -72,7 +72,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
           strokeWidth="1"
           strokeDasharray="2,2"
           opacity="0.2"
-        />
+        /> */}
         
         <path
           d={pathData}
@@ -87,13 +87,16 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
       {/* Interactive Experience Layer */}
       {experiences.map((experience, index) => {
         const yPos = HEADER_OFFSET + index * SPACING;
-        const curveOffset = getCurveX(yPos);
+        const curveOffset = getCurveX(yPos, windowWidth);
         
         // Stable rotation logic
         const rotation = (index % 5 - 2) * 1.5;
         
-        // Mobile-specific adjustment for the first card
-        const finalY = (windowWidth <= 768 && index === 0) ? yPos - 100 : yPos;
+        // Mobile-specific adjustment for the first card - move it higher on mobile
+        const finalY = (windowWidth <= 768 && index === 0) ? yPos - 150 : yPos;
+        
+        // Center HeaderNotecard on mobile (index === 0)
+        const finalCurveOffset = (windowWidth <= 768 && index === 0) ? 0 : curveOffset;
 
         return (
           <div
@@ -104,7 +107,7 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
               left: '50%',
               top: `${finalY}px`,
               // This ensures the element is perfectly centered on its coordinates
-              transform: `translate(calc(-50% + ${curveOffset}px), -50%)`,
+              transform: `translate(calc(-50% + ${finalCurveOffset}px), -50%)`,
             }}
           >
             {index === 0 ? (
