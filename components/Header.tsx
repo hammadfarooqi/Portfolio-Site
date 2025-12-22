@@ -17,7 +17,7 @@ export default function Header({ onTitleClick }: HeaderProps) {
       </h1>
       
       {/* Subtitle */}
-      <p className="text-sm text-gray-500 mb-6">Princeton '27 Undergrad</p>
+      <p className="text-sm text-gray-500 mb-6">Princeton &apos;27 Undergrad</p>
       
       {/* Links */}
       <div className="flex flex-col gap-2">

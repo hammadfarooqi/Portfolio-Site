@@ -141,6 +141,21 @@ export const experiences: Experience[] = [
         caption: "Hammad at the Spheres",
         longDescription: "Somehow color coordinated with fellow interns on an office trip to the Spheres."
       },
+      {
+        imageUrl: "/data/photos/amazon/amazon-2.jpeg",
+        caption: "Hammad's Last Day",
+        longDescription: "Had to take one last picture with the Amazon logo before leaving the Redmond office."
+      },
+      {
+        imageUrl: "/data/photos/amazon/amazon-3.jpeg",
+        caption: "Hammad's Final Presentation",
+        longDescription: "Fellow intern snuck a photo of me presenting to the Redshift organization across the country."
+      },
+      {
+        imageUrl: "/data/photos/amazon/amazon-4.JPG",
+        caption: "Hammad Winning Amazon Chess Day",
+        longDescription: "Won Amazon Chess Day (an office-wide chess tournament) against the entire Redmond office."
+      }
     ]
   },
   {

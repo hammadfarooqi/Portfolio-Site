@@ -5,6 +5,12 @@ import { Experience } from "@/data/experiences";
 import { getCurveX, getSpacing } from "@/utils/curve";
 import Notecard from "@/components/Notecard";
 import HeaderNotecard from "@/components/HeaderNotecard";
+import { Indie_Flower } from "next/font/google";
+
+const indieFlower = Indie_Flower({
+  weight: "400",
+  subsets: ["latin"],
+});
 
 interface TimelineProps {
   experiences: Experience[];
@@ -79,11 +85,44 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
             }}
           >
             {index === 0 ? (
-              <HeaderNotecard
-                experience={experience}
-                onClick={() => onThumbtackClick(experience, index)}
-                rotation={rotation}
-              />
+              <>
+                <HeaderNotecard
+                  experience={experience}
+                  onClick={() => onThumbtackClick(experience, index)}
+                  rotation={rotation}
+                />
+                {/* Instruction text with camera icon */}
+                <div
+                  className="absolute top-full mt-12 left-[65%] flex items-start gap-2"
+                  style={{
+                    transform: 'translate(-50%, 0) rotate(-4deg)',
+                  }}
+                >
+                  <svg
+                    className="w-7 h-7 text-gray-600 mt-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  <div className={`text-sm text-gray-600 ${indieFlower.className} min-w-[200px]`}>
+                    <p className="whitespace-nowrap">Point & Click to take Snapshots</p>
+                    <p>of each Notecard!</p>
+                  </div>
+                </div>
+              </>
             ) : (
               <Notecard
                 experience={experience}
