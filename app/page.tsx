@@ -16,11 +16,24 @@ interface PolaroidData {
   rotation: number;
 }
 
+// Fisher-Yates shuffle algorithm
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export default function Home() {
   const [polaroids, setPolaroids] = useState<PolaroidData[]>([]);
   const [showFlash, setShowFlash] = useState(false);
   const [flashKey, setFlashKey] = useState(0);
   const [windowWidth, setWindowWidth] = useState(0);
+  // State for shuffle-and-cycle photo selection
+  const [shuffledPhotos, setShuffledPhotos] = useState<Map<number, Photo[]>>(new Map());
+  const [photoIndices, setPhotoIndices] = useState<Map<number, number>>(new Map());
 
   useEffect(() => {
     const updateWidth = () => {
@@ -36,12 +49,47 @@ export default function Home() {
   }, []);
 
   const handleThumbtackClick = (experience: Experience, index: number) => {
-    // Randomly select a photo from the experience's photos
-    const randomPhoto = experience.photos[Math.floor(Math.random() * experience.photos.length)];
+    // Read current state to compute next values
+    const currentShuffled = shuffledPhotos.get(index);
+    const currentIndex = photoIndices.get(index) ?? 0;
+    
+    // Get or create shuffled photos array for this experience
+    let shuffled = currentShuffled;
+    let needsReshuffle = false;
+    
+    if (!shuffled) {
+      shuffled = shuffleArray(experience.photos);
+    }
+    
+    // Get the photo at current index
+    const selectedPhoto = shuffled[currentIndex];
+    
+    // Calculate next index
+    let nextIndex = currentIndex + 1;
+    if (nextIndex >= shuffled.length) {
+      // Cycle complete - reshuffle and reset
+      shuffled = shuffleArray(experience.photos);
+      needsReshuffle = true;
+      nextIndex = 0;
+    }
+    
+    // Update state
+    if (needsReshuffle || !currentShuffled) {
+      setShuffledPhotos(prev => {
+        const newMap = new Map(prev);
+        newMap.set(index, shuffled!);
+        return newMap;
+      });
+    }
+    
+    setPhotoIndices(prev => {
+      const newMap = new Map(prev);
+      newMap.set(index, nextIndex);
+      return newMap;
+    });
     
     // Generate random rotation angle between -15 and 15 degrees
     const randomRotation = Math.random() * 30 - 15;
-    // const randomRotation = 0;
 
     // Trigger flash by incrementing key to force remount
     setFlashKey(prev => prev + 1);
@@ -50,7 +98,7 @@ export default function Home() {
 
     // Add new Polaroid to the array after flash
     setTimeout(() => {
-      setPolaroids(prev => [...prev, { experience, photo: randomPhoto, index, rotation: randomRotation }]);
+      setPolaroids(prev => [...prev, { experience, photo: selectedPhoto, index, rotation: randomRotation }]);
     }, 50);
   };
 
