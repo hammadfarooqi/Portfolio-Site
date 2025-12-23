@@ -39,7 +39,7 @@ function HeaderNotecard({ experience, onClick, rotation = 0 }: HeaderNotecardPro
         <div className="flex flex-row gap-2 justify-center">
           {/* Resume Button */}
           <a
-            href="#"
+            href="/data/farooqi_hammad_resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center px-3 py-2 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded border border-gray-300 transition-colors"
@@ -51,7 +51,7 @@ function HeaderNotecard({ experience, onClick, rotation = 0 }: HeaderNotecardPro
           
           {/* LinkedIn Button - icon only */}
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/hammad-farooqi/"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center w-8 h-8 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded border border-gray-300 transition-colors"
@@ -66,7 +66,7 @@ function HeaderNotecard({ experience, onClick, rotation = 0 }: HeaderNotecardPro
           
           {/* GitHub Button - icon only */}
           <a
-            href="https://github.com"
+            href="https://github.com/hammadfarooqi"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center w-8 h-8 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded border border-gray-300 transition-colors"
