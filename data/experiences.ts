@@ -1,15 +1,4 @@
-export interface Photo {
-  imageUrl: string;
-  caption: string;
-  longDescription: string;
-}
-
-export interface Experience {
-  title: string;
-  date: string;
-  shortDescription: string; // For notecards
-  photos: Photo[]; // Multiple photos per experience
-}
+import { Experience, Photo } from "@/types";
 
 export const experiences: Experience[] = [
   {

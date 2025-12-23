@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Photo, Experience } from "@/data/experiences";
+import { Photo, Experience } from "@/types";
 import Image from "next/image";
 import { Kalam } from "next/font/google";
+import { isMobileWidth } from "@/constants/breakpoints";
 
 const kalam = Kalam({
   weight: "400",
@@ -18,8 +19,8 @@ interface PolaroidProps {
   windowWidth: number;
 }
 
-export default function Polaroid({ experience, photo, position, rotation, windowWidth }: PolaroidProps) {
-  const isMobile = windowWidth <= 768;
+export default function Polaroid({ experience, photo, position, rotation, windowWidth }: PolaroidProps): JSX.Element {
+  const isMobile = isMobileWidth(windowWidth);
   const polaroidWidth = isMobile ? 200 : 300;
   const offsetX = isMobile ? 100 : 150;
   
@@ -33,6 +34,8 @@ export default function Polaroid({ experience, photo, position, rotation, window
       initial={{ opacity: 0, scale: 0.8, rotate: rotation }}
       animate={{ opacity: 1, scale: 1, rotate: rotation }}
       transition={{ duration: 0.3 }}
+      role="img"
+      aria-label={`Photo from ${experience.title}: ${photo.caption}. ${photo.longDescription}`}
     >
       <div className="relative w-full h-[170px] md:h-64 mb-2 overflow-hidden bg-white">
         <motion.div

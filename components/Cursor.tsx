@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export default function Cursor() {
+export default function Cursor(): JSX.Element | null {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [isInViewport, setIsInViewport] = useState(true);

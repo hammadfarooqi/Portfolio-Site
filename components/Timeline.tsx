@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { Experience } from "@/data/experiences";
+import { useMemo } from "react";
+import { Experience } from "@/types";
 import { getCurveX, getSpacing } from "@/utils/curve";
 import Notecard from "@/components/Notecard";
 import HeaderNotecard from "@/components/HeaderNotecard";
 import { Indie_Flower } from "next/font/google";
+import { useWindowWidth } from "@/hooks/useWindowWidth";
+import { isMobileWidth } from "@/constants/breakpoints";
 
 const indieFlower = Indie_Flower({
   weight: "400",
@@ -18,31 +20,19 @@ interface TimelineProps {
 }
 
 export default function Timeline({ experiences, onThumbtackClick }: TimelineProps) {
-  const [windowWidth, setWindowWidth] = useState(0);
+  const windowWidth = useWindowWidth();
   
   // Basic padding and spacing constants
   const SPACING = getSpacing();
   const HEADER_OFFSET = 250;
   const totalHeight = experiences.length * SPACING + 400;
 
-  useEffect(() => {
-    const updateWidth = () => {
-      // document.documentElement.clientWidth is the gold standard for 
-      // viewport width excluding scrollbars on all devices.
-      setWindowWidth(document.documentElement.clientWidth);
-    };
-    
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
-  }, []);
-
   // centerX is now ONLY used for the SVG path rendering, 
   // as the cards will use CSS '50%' for centering.
   const centerX = windowWidth / 2;
 
   // Memoize the path to prevent expensive re-calculations on every render
-  const pathData = useMemo(() => {
+  const pathData = useMemo((): string => {
     if (windowWidth === 0) return "";
     const points: string[] = [];
     for (let y = 0; y <= totalHeight; y += 4) {
@@ -62,17 +52,6 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
         className="absolute top-0 left-0 w-full h-full pointer-events-none"
         style={{ overflow: 'visible' }}
       >
-        {/* Debug Line (Optional: Remove in production) */}
-        {/* <line
-          x1="50%"
-          y1={0}
-          x2="50%"
-          y2={totalHeight}
-          stroke="#ef4444"
-          strokeWidth="1"
-          strokeDasharray="2,2"
-          opacity="0.2"
-        /> */}
         
         <path
           d={pathData}
@@ -93,10 +72,10 @@ export default function Timeline({ experiences, onThumbtackClick }: TimelineProp
         const rotation = (index % 5 - 2) * 1.5;
         
         // Mobile-specific adjustment for the first card - move it higher on mobile
-        const finalY = (windowWidth <= 768 && index === 0) ? yPos - 150 : yPos;
+        const finalY = (isMobileWidth(windowWidth) && index === 0) ? yPos - 150 : yPos;
         
         // Center HeaderNotecard on mobile (index === 0)
-        const finalCurveOffset = (windowWidth <= 768 && index === 0) ? 0 : curveOffset;
+        const finalCurveOffset = (isMobileWidth(windowWidth) && index === 0) ? 0 : curveOffset;
 
         return (
           <div

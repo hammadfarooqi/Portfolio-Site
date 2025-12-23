@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { Experience } from "@/data/experiences";
+import { Experience } from "@/types";
 
 interface HeaderNotecardProps {
   experience: Experience;
@@ -9,7 +9,7 @@ interface HeaderNotecardProps {
   rotation?: number;
 }
 
-function HeaderNotecard({ experience, onClick, rotation = 0 }: HeaderNotecardProps) {
+function HeaderNotecard({ experience, onClick, rotation = 0 }: HeaderNotecardProps): JSX.Element {
   return (
     <div
       className="relative cursor-pointer group"
@@ -45,6 +45,7 @@ function HeaderNotecard({ experience, onClick, rotation = 0 }: HeaderNotecardPro
             className="flex items-center justify-center px-3 py-2 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded border border-gray-300 transition-colors"
             data-clickable="true"
             onClick={(e) => e.stopPropagation()}
+            aria-label="View resume (opens in new tab)"
           >
             Resume
           </a>

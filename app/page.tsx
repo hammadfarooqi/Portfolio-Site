@@ -1,61 +1,41 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import Timeline from "@/components/Timeline";
 import Polaroid from "@/components/Polaroid";
 import FlashOverlay from "@/components/FlashOverlay";
-import { experiences, Experience, Photo } from "@/data/experiences";
+import { experiences } from "@/data/experiences";
+import { Experience, PolaroidData } from "@/types";
 import { getCurveX, getSpacing } from "@/utils/curve";
+import { shuffleArray } from "@/utils/shuffle";
+import { useWindowWidth } from "@/hooks/useWindowWidth";
+import { isMobileWidth, isWideScreen } from "@/constants/breakpoints";
 
 const FLASH_DURATION = 0.5; // in seconds
-
-interface PolaroidData {
-  experience: Experience;
-  photo: Photo;
-  index: number;
-  rotation: number;
-}
-
-// Fisher-Yates shuffle algorithm
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
 
 export default function Home() {
   const [polaroids, setPolaroids] = useState<PolaroidData[]>([]);
   const [showFlash, setShowFlash] = useState(false);
-  const [flashKey, setFlashKey] = useState(0);
-  const [windowWidth, setWindowWidth] = useState(0);
+  const windowWidth = useWindowWidth();
   // State for shuffle-and-cycle photo selection
-  const [shuffledPhotos, setShuffledPhotos] = useState<Map<number, Photo[]>>(new Map());
+  const [shuffledPhotos, setShuffledPhotos] = useState<Map<number, typeof experiences[0]['photos']>>(new Map());
   const [photoIndices, setPhotoIndices] = useState<Map<number, number>>(new Map());
+  const polaroidIdCounter = useRef(0);
+  const shuffledPhotosRef = useRef(shuffledPhotos);
+  const photoIndicesRef = useRef(photoIndices);
+  
+  // Keep refs in sync with state
+  shuffledPhotosRef.current = shuffledPhotos;
+  photoIndicesRef.current = photoIndices;
 
-  useEffect(() => {
-    const updateWidth = () => {
-      // On mobile, use clientWidth to exclude scrollbar for accurate centering
-      const width = window.innerWidth <= 768 
-        ? (document.documentElement.clientWidth || window.innerWidth)
-        : window.innerWidth;
-      setWindowWidth(width);
-    };
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
-  }, []);
-
-  const handleThumbtackClick = (experience: Experience, index: number) => {
-    // Read current state to compute next values
-    const currentShuffled = shuffledPhotos.get(index);
-    const currentIndex = photoIndices.get(index) ?? 0;
+  const handleThumbtackClick = useCallback((experience: Experience, index: number) => {
+    // Read current state values using refs (synchronous access)
+    const currentShuffled = shuffledPhotosRef.current.get(index);
+    const currentIndex = photoIndicesRef.current.get(index) ?? 0;
     
     // Get or create shuffled photos array for this experience
     let shuffled = currentShuffled;
-    let needsReshuffle = false;
+    let needsReshuffle = !currentShuffled;
     
     if (!shuffled) {
       shuffled = shuffleArray(experience.photos);
@@ -69,12 +49,12 @@ export default function Home() {
     if (nextIndex >= shuffled.length) {
       // Cycle complete - reshuffle and reset
       shuffled = shuffleArray(experience.photos);
-      needsReshuffle = true;
       nextIndex = 0;
+      needsReshuffle = true;
     }
     
-    // Update state
-    if (needsReshuffle || !currentShuffled) {
+    // Batch state updates (React 18 automatically batches these)
+    if (needsReshuffle) {
       setShuffledPhotos(prev => {
         const newMap = new Map(prev);
         newMap.set(index, shuffled!);
@@ -90,27 +70,35 @@ export default function Home() {
     
     // Generate random rotation angle between -15 and 15 degrees
     const randomRotation = Math.random() * 30 - 15;
+    
+    // Generate unique ID for polaroid
+    const polaroidId = `polaroid-${polaroidIdCounter.current++}`;
 
-    // Trigger flash by incrementing key to force remount
-    setFlashKey(prev => prev + 1);
+    // Trigger flash animation
     setShowFlash(true);
     setTimeout(() => setShowFlash(false), FLASH_DURATION * 1000);
 
     // Add new Polaroid to the array after flash
     setTimeout(() => {
-      setPolaroids(prev => [...prev, { experience, photo: selectedPhoto, index, rotation: randomRotation }]);
+      setPolaroids(prev => [...prev, { 
+        experience, 
+        photo: selectedPhoto, 
+        index, 
+        rotation: randomRotation,
+        id: polaroidId
+      }]);
     }, 50);
-  };
+  }, []);
 
-  const getPolaroidPosition = (index: number) => {
+  const getPolaroidPosition = useCallback((index: number) => {
     const centerX = (windowWidth > 0 ? windowWidth / 2 : 800);
-    const wideScreen = windowWidth >= 1152;
-    const thinScreen = windowWidth <= 768;
+    const wideScreen = isWideScreen(windowWidth);
+    const isMobile = isMobileWidth(windowWidth);
 
     if (index === 0) {
       return {
-        top: thinScreen ? 200 : 40, // Much lower on mobile
-        horizontal: centerX - (wideScreen ? 300 : thinScreen ? 100 : 250),
+        top: isMobile ? 200 : 40, // Much lower on mobile
+        horizontal: centerX - (wideScreen ? 300 : isMobile ? 100 : 250),
       };
     }
     
@@ -121,24 +109,24 @@ export default function Home() {
     // Position Polaroid offset from the thumbtack
     // For xl/2xl screens: offsetX = x < centerX ? -300 : 300
     // For lg and lower screens: offsetX = x < centerX ? 300 : -300
-    // For mobile (thinScreen): use 200 instead of 300
-    const polaroidWidth = thinScreen ? 200 : 300;
+    // For mobile (isMobile): use 200 instead of 300
+    const polaroidWidth = isMobile ? 200 : 300;
     const offsetX = wideScreen 
       ? (x < centerX ? -300 : 300)
       : (x < centerX ? polaroidWidth : -polaroidWidth);
     
     // On mobile, make polaroids appear slightly lower
-    const placementY = wideScreen ? y - 50 : (thinScreen ? y - 100 : y - 200);
+    const placementY = wideScreen ? y - 50 : (isMobile ? y - 100 : y - 200);
 
     return {
       top: placementY,
       horizontal: x + offsetX,
     };
-  };
+  }, [windowWidth]);
 
   return (
     <main className="min-h-screen relative">
-      <FlashOverlay key={flashKey} isVisible={showFlash} duration={FLASH_DURATION} />
+      <FlashOverlay isVisible={showFlash} duration={FLASH_DURATION} />
       
       <Timeline 
         experiences={experiences} 
@@ -146,9 +134,9 @@ export default function Home() {
       />
       
       {/* Polaroids */}
-      {polaroids.map((polaroid, i) => (
+      {polaroids.map((polaroid) => (
         <Polaroid
-          key={`${polaroid.index}-${i}-${polaroid.photo.imageUrl}`}
+          key={polaroid.id}
           experience={polaroid.experience}
           photo={polaroid.photo}
           position={getPolaroidPosition(polaroid.index)}

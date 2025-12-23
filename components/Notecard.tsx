@@ -1,7 +1,7 @@
 "use client";
 
 import { memo } from "react";
-import { Experience } from "@/data/experiences";
+import { Experience } from "@/types";
 
 interface NotecardProps {
   experience: Experience;
@@ -9,7 +9,7 @@ interface NotecardProps {
   rotation?: number;
 }
 
-function Notecard({ experience, onClick, rotation = 0 }: NotecardProps) {
+function Notecard({ experience, onClick, rotation = 0 }: NotecardProps): JSX.Element {
   // Truncate shortDescription if too long
   const maxDescriptionLength = 100;
   const truncatedDescription = 
